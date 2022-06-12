@@ -1,3 +1,8 @@
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import Vue from "vue";
 import Vuex from "vuex";
 
@@ -34,10 +39,7 @@ export default new Vuex.Store({
         location: "Viet Nam",
       },
     ],
-    user: {
-      id: 1,
-      registeredMeetup: ["adsqwe2e321asdqw"],
-    },
+    user: null,
   },
   getters: {
     loadedMeetups(state) {
@@ -55,10 +57,16 @@ export default new Vuex.Store({
         });
       };
     },
+    getUser(state) {
+      return state.user;
+    },
   },
   mutations: {
     createMeetup(state, payload) {
       state.loadedMeetups.push(payload);
+    },
+    setUser(state, payload) {
+      state.user = payload;
     },
   },
   actions: {
@@ -72,6 +80,35 @@ export default new Vuex.Store({
         id: 4,
       };
       commit("createMeetup", meetup);
+    },
+    signUpUser({ commit }, payload) {
+      createUserWithEmailAndPassword(getAuth(), payload.email, payload.password)
+        .then((data) => {
+          const newUser = {
+            id: data.user.uid,
+            registeredMeetup: [],
+          };
+          commit("setUser", newUser);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    signInUser({ commit }, payload) {
+      signInWithEmailAndPassword(getAuth(), payload.email, payload.password)
+        .then((data) => {
+          const user = {
+            id: data.user.uid,
+            registeredMeetup: [],
+          };
+          commit("setUser", user);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    user(state) {
+      return state.user;
     },
   },
   modules: {},

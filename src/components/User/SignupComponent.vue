@@ -5,7 +5,7 @@
         <v-card>
           <v-card-text>
             <v-container>
-              <form>
+              <form @submit.prevent="onSignup">
                 <v-layout row>
                   <v-col xs="12">
                     <v-text-field
@@ -71,13 +71,24 @@ export default {
         ? "Password do not match"
         : "";
     },
+    user() {
+      return this.$store.getters.getUser;
+    },
+  },
+  watch: {
+    user(value) {
+      if (value !== null && value != undefined) {
+        console.log("yes");
+
+        this.$router.push(`/`);
+      }
+    },
   },
   methods: {
     onSignup() {
-      console.log({
+      this.$store.dispatch("signUpUser", {
         email: this.email,
         password: this.password,
-        confirmPassword: this.confirmPassword,
       });
     },
   },
