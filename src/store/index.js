@@ -3,8 +3,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+// import { doc, setDoc } from "firebase/firestore";
 import Vue from "vue";
 import Vuex from "vuex";
+import app from "./../firebaseInit.js";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 Vue.use(Vuex);
 
@@ -87,15 +90,26 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    createMeetup({ commit }, payload) {
+    async createMeetup({ commit }, payload) {
       const meetup = {
         title: payload.title,
         location: payload.location,
         imageUrl: payload.imageUrl,
         description: payload.description,
-        date: payload.date,
-        id: 4,
+        date: payload.date.toISOString(),
       };
+      const db = getFirestore(app);
+      const docRef = await addDoc(collection(db, "meetups"), meetup);
+      console.log("Document written with ID: ", docRef.id);
+      // db.collection("meetups")
+      //   .add(meetup)
+      //   .then((data) => {
+      //     console.log(data);
+      //     commit("createMeetup", meetup);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
       commit("createMeetup", meetup);
     },
 

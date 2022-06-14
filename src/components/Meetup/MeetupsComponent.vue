@@ -19,7 +19,7 @@
                     <div>{{ meetup.date | date }}</div>
                   </div>
                 </v-card-title>
-                <v-card-action>
+                <v-card-actions>
                   <v-btn text route :to="`/meetups/${meetup.id}`" height="48px">
                     <v-icon color="blue-grey darken-3"
                       >mdi-arrow-top-right</v-icon
@@ -28,7 +28,7 @@
                       >VIEW MEETUP</v-list-item-title
                     >
                   </v-btn>
-                </v-card-action>
+                </v-card-actions>
               </v-col>
             </v-layout>
           </v-container>
