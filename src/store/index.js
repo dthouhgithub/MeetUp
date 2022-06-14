@@ -40,6 +40,8 @@ export default new Vuex.Store({
       },
     ],
     user: null,
+    loading: false,
+    error: null,
   },
   getters: {
     loadedMeetups(state) {
@@ -60,6 +62,12 @@ export default new Vuex.Store({
     getUser(state) {
       return state.user;
     },
+    getLoading(state) {
+      return state.loading;
+    },
+    getError(state) {
+      return state.error;
+    },
   },
   mutations: {
     createMeetup(state, payload) {
@@ -67,6 +75,15 @@ export default new Vuex.Store({
     },
     setUser(state, payload) {
       state.user = payload;
+    },
+    setLoading(state, payload) {
+      state.loading = payload;
+    },
+    setError(state, payload) {
+      state.error = payload;
+    },
+    clearError(state) {
+      state.error = null;
     },
   },
   actions: {
@@ -81,9 +98,12 @@ export default new Vuex.Store({
       };
       commit("createMeetup", meetup);
     },
+
     signUpUser({ commit }, payload) {
+      commit("setLoading", true);
       createUserWithEmailAndPassword(getAuth(), payload.email, payload.password)
         .then((data) => {
+          commit("setLoading", false);
           const newUser = {
             id: data.user.uid,
             registeredMeetup: [],
@@ -91,12 +111,16 @@ export default new Vuex.Store({
           commit("setUser", newUser);
         })
         .catch((error) => {
-          console.log(error);
+          commit("setLoading", false);
+          commit("setError", error);
+          console.log(error.code);
         });
     },
     signInUser({ commit }, payload) {
+      commit("setLoading", true);
       signInWithEmailAndPassword(getAuth(), payload.email, payload.password)
         .then((data) => {
+          commit("setLoading", false);
           const user = {
             id: data.user.uid,
             registeredMeetup: [],
@@ -104,11 +128,14 @@ export default new Vuex.Store({
           commit("setUser", user);
         })
         .catch((error) => {
+          commit("setLoading", false);
+          commit("setError", error);
           console.log(error);
         });
     },
-    user(state) {
-      return state.user;
+    clearError({ commit }) {
+      console.log("asdasd");
+      commit("clearError");
     },
   },
   modules: {},

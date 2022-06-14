@@ -5,10 +5,12 @@ import store from "./store";
 import vuetify from "./plugins/vuetify";
 import DateFilter from "./filter/date";
 import { initializeApp } from "firebase/app";
+import AlertComponent from "./components/Shared/AlertComponent.vue";
 
 Vue.config.productionTip = false;
 
 Vue.filter("date", DateFilter);
+Vue.component("alert-component", AlertComponent);
 new Vue({
   router,
   store,
