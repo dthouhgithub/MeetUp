@@ -101,15 +101,6 @@ export default new Vuex.Store({
       const db = getFirestore(app);
       const docRef = await addDoc(collection(db, "meetups"), meetup);
       console.log("Document written with ID: ", docRef.id);
-      // db.collection("meetups")
-      //   .add(meetup)
-      //   .then((data) => {
-      //     console.log(data);
-      //     commit("createMeetup", meetup);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
       commit("createMeetup", meetup);
     },
 
