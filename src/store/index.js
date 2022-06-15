@@ -3,45 +3,15 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-// import { doc, setDoc } from "firebase/firestore";
 import Vue from "vue";
 import Vuex from "vuex";
 import app from "./../firebaseInit.js";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    loadedMeetups: [
-      {
-        imageUrl:
-          "https://autopro8.mediacdn.vn/2021/11/16/supercar-blondie-bmw-i8-1-1637051107327669612828.jpg",
-        id: 1,
-        title: "Meetup loren",
-        date: new Date(),
-        description: "This is description",
-        location: "Viet Nam",
-      },
-      {
-        imageUrl:
-          "https://autopro8.mediacdn.vn/2021/11/16/supercar-blondie-bmw-i8-1637050551587809995649.jpg",
-        id: 2,
-        title: "Meetup BMW",
-        date: new Date(),
-        description: "This is description",
-        location: "Viet Nam",
-      },
-      {
-        imageUrl:
-          "https://autopro8.mediacdn.vn/2021/11/16/supercar-blondie-rolls-royce-wraith-black-badge-2-1637051688691320073799.jpg",
-        id: 3,
-        title: "Meetup Roll Royce",
-        date: new Date(),
-        description: "This is description",
-        location: "Viet Nam",
-      },
-    ],
+    loadedMeetups: null,
     user: null,
     loading: false,
     error: null,
@@ -88,8 +58,36 @@ export default new Vuex.Store({
     clearError(state) {
       state.error = null;
     },
+    setLoadedMeetup(state, payload) {
+      state.loadedMeetups = payload;
+    },
   },
   actions: {
+    async loadMeetups({ commit }) {
+      commit("setLoading", true);
+      const db = getFirestore(app);
+      const meetups = [];
+      await getDocs(collection(db, "meetups"))
+        .then((data) => {
+          data.forEach((doc) => {
+            data = doc.data();
+            meetups.push({
+              id: doc.id,
+              title: data.title,
+              date: data.date,
+              description: data.description,
+              location: data.location,
+              imageUrl: data.imageUrl,
+            });
+          });
+          commit("setLoadedMeetup", meetups);
+          commit("setLoading", false);
+        })
+        .catch((error) => {
+          commit("setLoading", true);
+          console.log(error);
+        });
+    },
     async createMeetup({ commit }, payload) {
       const meetup = {
         title: payload.title,
@@ -99,9 +97,18 @@ export default new Vuex.Store({
         date: payload.date.toISOString(),
       };
       const db = getFirestore(app);
-      const docRef = await addDoc(collection(db, "meetups"), meetup);
-      console.log("Document written with ID: ", docRef.id);
-      commit("createMeetup", meetup);
+      await addDoc(collection(db, "meetups"), meetup)
+        .then((data) => {
+          commit("createMeetup", {
+            ...meetup,
+            id: data.id,
+          });
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          commit("setError", error);
+          console.log(error.code);
+        });
     },
 
     signUpUser({ commit }, payload) {

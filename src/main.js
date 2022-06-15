@@ -16,5 +16,7 @@ new Vue({
   store,
   vuetify,
   render: (h) => h(App),
-  created() {},
+  created() {
+    this.$store.dispatch("loadMeetups");
+  },
 }).$mount("#app");
