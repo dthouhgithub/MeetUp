@@ -59,7 +59,38 @@ export default {
       return this.$store.getters.featuredMeetups;
     },
   },
+  mounted() {
+    this.scrollToHash()
+    this.$root.$on('scrollToElement', () => {
+      setTimeout(() => {
+        this.scrollToHash()
+      }, 50)
+    })
+  },
   methods: {
+    scrollToHash() {
+      if (this.$route.hash) {
+        const sectionName = this.$route.hash.replace('#', '')
+        const sectionElement = this.$refs[sectionName]
+        if (sectionElement) {
+          let top =
+            document.documentElement.scrollTop +
+            sectionElement.getBoundingClientRect().top -
+            (window.innerWidth > 768 ? 116 : 57)
+          if (sectionName === 'news') top -= window.innerWidth > 768 ? 150 : 75
+          window.scrollTo({
+            top,
+            left: 0,
+            behavior: 'smooth',
+          })
+        }
+      } else {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+        })
+      }
+    },
     onLoadMeetup(id) {
       this.$router.push(`/meetups/${id}`);
     },
